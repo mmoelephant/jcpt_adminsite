@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,height=device-height, user-scalable=no,initial-scale=1, minimum-scale=1, maximum-scale=1">
+<title>监测平台后台管理系统</title>
+<link href="css/login.css" rel="stylesheet" type="text/css">
+<script src="js/jquery-3.1.1.min.js"></script>
+<script src="js/jquery.validate.min.js"></script>
+<script src="js/validate-zh_cn.js"></script>
+<script src="js/layer.js"></script>
+</head>
+
+<body>
+<div class="bg">
+    <div class="contentBox">
+        <div class="leftPic">
+            <img src="images/colorPic.png">
+        </div>
+        <div class="rightDo">
+            <div class="rightBox">
+                <div class="whatName">监测平台后台管理系统</div>
+                <div class="welcome">欢迎登录</div>
+                <form name="wpf_login_form" method="post" action="/" novalidate="novalidate" class="doBox">
+                    <section class="login01">
+                        <div class="itemname username">用户名</div>
+                        <input type="text" name="username" onblur="showImageCode()" class="text usertext" placeholder="请输入用户名">
+                    </section>
+                    <section class="login02" style="margin-top:30px;">
+                        <div class="itemname pswname">密码</div>
+                        <input type="password" name="password" onblur="showImageCode()" class="text" placeholder="请输入密码" aria-required="true" aria-invalid="true">
+                    </section>
+                    <section class="login03 none" id="imagecode" style="margin-top:30px;">
+                        <div class="itemname code">验证码</div>
+                        <i onclick="$('#codeImage').attr('src', '/index.php/Admin/Index/getImageCode/'+Math.random());" class="yzm">
+                            <img id="codeImage" src="/index.php/Admin/Index/getImageCode/0.84026778777277" width="110" height="30" title="看不清楚请点击刷新验证码">
+                        </i>
+                        <input type="text" name="imagecode" class="text" placeholder="请输入验证码">
+                    </section>
+                    <section class="btnBox">
+                        <input type="submit" value="登 录" class="sub">
+                    </section>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$("form[name=wpf_login_form]").validate({
+	submitHandler: function(form) 
+   	{
+		login();
+   	},
+	rules:{
+		username:{
+			required:true,
+			remote:"/index.php/Admin/Index/ajaxCheckUsername.html"
+		}, 
+		password:{
+			required:true,
+			rangelength:[6,20]
+		},
+		imagecode:{
+			required:true,
+			rangelength:[4,4]
+		}
+	},
+	messages:{
+		username:{
+			remote:"账号不存在"
+		},
+		password:{
+			rangelength:"密码6至20位"
+		},
+		imagecode:{
+			rangelength:"格式不正确"
+		} 
+	}
+});
+
+//登录
+function login()
+{
+	var username = $("input[name=username]").val();
+	var password = $("input[name=password]").val();
+	var imagecode = $("input[name=imagecode]").val();
+	var gourl = "/hlD52alfredEry73";
+	$.ajax({
+		type : "POST",
+		url:"/hlC8KwpftgC2U73e",
+		data:{
+			username:username,
+			password:password,
+			imagecode:imagecode
+		},
+		dataType : "json",
+		success:function (data){
+			if(data.errcode == 0)
+			{
+				layer.msg('登录成功',{
+					time:2000,
+	    			anim:2,
+	    			offset:'80%'
+	    		},function(){
+	    			location.href = gourl;
+	    		});
+			}
+			else if(data.errcode == 113)//验证码错误
+			{
+				layer.msg('验证码错误，请重新输入',{
+	    			anim:2,
+	    			offset:'80%'
+	    		});
+				$("#imagecode").removeClass("none");//显示验证码
+				$('#codeImage').attr('src', '/index.php/Admin/Index/getImageCode/'+Math.random());
+				$("input[name=imagecode]").val("");
+				$("input[name=imagecode]").focus();
+			}
+			else
+			{
+				layer.msg(data.errmsg,{
+	    			anim:2,
+	    			offset:'80%'
+	    		});
+	    		showImageCode();
+			}
+				
+		}
+	})
+}
+
+function showImageCode()
+{
+	var username = $("input[name=username]").val();
+	if(username.length > 1)
+	{
+		$.ajax({
+			type : "POST",
+			url:"/index.php/Admin/Index/ajaxShowImageCode",
+			data : {username:username},// 收集表单中的数据
+			dataType : "json",
+			success : function(data)
+			{
+				if(data.errcode == 1)//显示验证码
+				{
+					$("#imagecode").removeClass("none");
+				}
+				else
+				{
+					$("#imagecode").addClass("none");
+					$("section .text.usertext").addClass("bingo");
+				}
+			}
+		});
+	}
+}
+
+$(document).ready(function(){
+	$("section .text").focusin(function(){
+        $(this).addClass("sel");
+        $(this).prev().addClass("active")
+	});
+	$("section .text").focusout(function(){
+        $(this).removeClass("sel");
+        $(this).prev().removeClass("active")
+	});
+});
+</script>
+</body>
+</html>
